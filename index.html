@@ -55,8 +55,11 @@
   <button onclick="generarIMEIs()">Generar</button>
 
   <h2>🔍 Validador de IMEI</h2>
-  <input type="text" id="imeiValidar" placeholder="Ingresa IMEI">
-  <button onclick="validarIMEI()">Validar</button>
+  <div>
+    <input type="text" id="imeiValidar" placeholder="Ingresa IMEI">
+    <button onclick="pegarIMEI()">📋 Pegar</button>
+    <button onclick="validarIMEI()">Validar</button>
+  </div>
   <p id="validacionResultado"></p>
 
   <div class="imei-list" id="lista"></div>
@@ -115,6 +118,14 @@
       navigator.clipboard.writeText(texto)
         .then(() => alert("IMEI copiado: " + texto))
         .catch(() => alert("Error al copiar"));
+    }
+
+    function pegarIMEI() {
+      navigator.clipboard.readText()
+        .then(texto => {
+          document.getElementById("imeiValidar").value = texto.trim();
+        })
+        .catch(() => alert("❌ No se pudo acceder al portapapeles."));
     }
 
     function validarIMEI() {
