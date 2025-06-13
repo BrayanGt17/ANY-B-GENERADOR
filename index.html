@@ -2,27 +2,22 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Generador de IMEI</title>
+  <title>Generador y Validador de IMEI</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f1f1f1;
-      padding: 20px;
+      font-family: sans-serif;
+      background-color: #f0f0f0;
       text-align: center;
-    }
-    h1 {
-      color: #333;
+      padding: 20px;
     }
     input, button {
       padding: 10px;
-      margin: 10px;
+      margin: 5px;
     }
     .imei-list {
       margin-top: 20px;
-      text-align: left;
       max-width: 500px;
-      margin: 0 auto;
+      margin: auto;
       background: #fff;
       padding: 15px;
       border-radius: 8px;
@@ -30,32 +25,40 @@
     .imei-item {
       display: flex;
       justify-content: space-between;
-      border-bottom: 1px solid #ccc;
-      padding: 5px 0;
-    }
-    .imei-item button {
-      padding: 5px;
+      margin-bottom: 5px;
     }
   </style>
 </head>
 <body>
-  <h1>🔢 Generador de IMEI</h1>
+  <h1>🔢 Generador y Validador de IMEI</h1>
 
-  <label>Cantidad:</label>
-  <input type="number" id="cantidad" value="10" min="1" max="100"><br>
+  <div>
+    <label>Primeros 2 dígitos (opcional):</label>
+    <input type="text" id="prefijo" maxlength="2" placeholder="Ej: 35">
+  </div>
+
+  <div>
+    <label>Cantidad:</label>
+    <input type="number" id="cantidad" value="10" min="1" max="100">
+  </div>
 
   <button onclick="generarIMEIs()">Generar</button>
+
+  <h2>🔍 Validador de IMEI</h2>
+  <input type="text" id="imeiValidar" placeholder="Ingresa IMEI">
+  <button onclick="validarIMEI()">Validar</button>
+  <p id="validacionResultado"></p>
 
   <div class="imei-list" id="lista"></div>
 
   <script>
-    function generarIMEI() {
-      let imei = '';
-      for (let i = 0; i < 14; i++) {
+    function generarIMEI(prefijo = '') {
+      let imei = prefijo;
+
+      for (let i = prefijo.length; i < 14; i++) {
         imei += Math.floor(Math.random() * 10);
       }
 
-      // Luhn Check Digit
       let sum = 0;
       for (let i = 0; i < 14; i++) {
         let num = parseInt(imei.charAt(i));
@@ -63,16 +66,24 @@
         if (num > 9) num -= 9;
         sum += num;
       }
+
       let checkDigit = (10 - (sum % 10)) % 10;
       return imei + checkDigit;
     }
 
     function generarIMEIs() {
       const cantidad = parseInt(document.getElementById("cantidad").value);
+      const prefijo = document.getElementById("prefijo").value;
       const lista = document.getElementById("lista");
       lista.innerHTML = '';
+
+      if (prefijo && (!/^\d{2}$/.test(prefijo))) {
+        alert("El prefijo debe tener exactamente 2 dígitos numéricos.");
+        return;
+      }
+
       for (let i = 0; i < cantidad; i++) {
-        const imei = generarIMEI();
+        const imei = generarIMEI(prefijo);
         const div = document.createElement("div");
         div.className = "imei-item";
         div.innerHTML = `
@@ -86,7 +97,36 @@
     function copiarTexto(texto) {
       navigator.clipboard.writeText(texto)
         .then(() => alert("IMEI copiado: " + texto))
-        .catch(err => alert("Error al copiar"));
+        .catch(() => alert("Error al copiar"));
+    }
+
+    function validarIMEI() {
+      const imei = document.getElementById("imeiValidar").value.trim();
+      const resultado = document.getElementById("validacionResultado");
+
+      if (!/^\d{15}$/.test(imei)) {
+        resultado.textContent = "❌ IMEI inválido: debe tener exactamente 15 dígitos.";
+        resultado.style.color = "red";
+        return;
+      }
+
+      let sum = 0;
+      for (let i = 0; i < 14; i++) {
+        let num = parseInt(imei.charAt(i));
+        if (i % 2 === 1) num *= 2;
+        if (num > 9) num -= 9;
+        sum += num;
+      }
+
+      let checkDigit = (10 - (sum % 10)) % 10;
+
+      if (checkDigit === parseInt(imei.charAt(14))) {
+        resultado.textContent = "✅ IMEI válido y limpio (formato correcto y pasa Luhn).";
+        resultado.style.color = "green";
+      } else {
+        resultado.textContent = "❌ IMEI inválido: no pasa verificación Luhn.";
+        resultado.style.color = "red";
+      }
     }
   </script>
 </body>
