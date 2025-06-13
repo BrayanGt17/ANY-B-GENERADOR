@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Generador y Validador de IMEI</title>
+  <title>Generador y Validador de IMEI - ANY-B</title>
   <style>
     body {
       font-family: sans-serif;
@@ -27,6 +27,16 @@
       justify-content: space-between;
       margin-bottom: 5px;
     }
+    footer {
+      margin-top: 40px;
+      color: #888;
+      font-size: 0.9em;
+    }
+    .marca-agua {
+      font-size: 0.7em;
+      color: #aaa;
+      margin-top: 5px;
+    }
   </style>
 </head>
 <body>
@@ -50,6 +60,10 @@
   <p id="validacionResultado"></p>
 
   <div class="imei-list" id="lista"></div>
+
+  <footer>
+    Creado por <strong>ANY-B</strong> 💻
+  </footer>
 
   <script>
     function generarIMEI(prefijo = '') {
@@ -88,7 +102,10 @@
         div.className = "imei-item";
         div.innerHTML = `
           <span>${imei}</span>
-          <button onclick="copiarTexto('${imei}')">Copiar</button>
+          <div>
+            <button onclick="copiarTexto('${imei}')">Copiar</button>
+            <div class="marca-agua">Creado por ANY-B</div>
+          </div>
         `;
         lista.appendChild(div);
       }
@@ -121,10 +138,10 @@
       let checkDigit = (10 - (sum % 10)) % 10;
 
       if (checkDigit === parseInt(imei.charAt(14))) {
-        resultado.textContent = "✅ IMEI válido y limpio (formato correcto y pasa Luhn).";
+        resultado.textContent = "✅ IMEI válido y limpio (formato correcto).";
         resultado.style.color = "green";
       } else {
-        resultado.textContent = "❌ IMEI inválido: no pasa verificación Luhn.";
+        resultado.textContent = "❌ IMEI inválido: no pasa verificación.";
         resultado.style.color = "red";
       }
     }
