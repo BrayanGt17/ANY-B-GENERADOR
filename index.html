@@ -37,6 +37,38 @@
       color: #aaa;
       margin-top: 5px;
     }
+
+    /* Estilo para notificación flotante */
+    #toast {
+      visibility: hidden;
+      min-width: 250px;
+      background-color: #4CAF50;
+      color: white;
+      text-align: center;
+      border-radius: 8px;
+      padding: 10px;
+      position: fixed;
+      z-index: 1;
+      left: 50%;
+      bottom: 30px;
+      transform: translateX(-50%);
+      font-size: 0.9em;
+    }
+
+    #toast.show {
+      visibility: visible;
+      animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    }
+
+    @keyframes fadein {
+      from { bottom: 0; opacity: 0; }
+      to { bottom: 30px; opacity: 1; }
+    }
+
+    @keyframes fadeout {
+      from { bottom: 30px; opacity: 1; }
+      to { bottom: 0; opacity: 0; }
+    }
   </style>
 </head>
 <body>
@@ -67,6 +99,8 @@
   <footer>
     Creado por <strong>ANY-B</strong> 💻
   </footer>
+
+  <div id="toast">IMEI copiado 📋</div>
 
   <script>
     function generarIMEI(prefijo = '') {
@@ -116,8 +150,17 @@
 
     function copiarTexto(texto) {
       navigator.clipboard.writeText(texto)
-        .then(() => alert("IMEI copiado: " + texto))
-        .catch(() => alert("Error al copiar"));
+        .then(() => mostrarToast("IMEI copiado 📋"))
+        .catch(() => mostrarToast("Error al copiar ❌"));
+    }
+
+    function mostrarToast(mensaje) {
+      const toast = document.getElementById("toast");
+      toast.textContent = mensaje;
+      toast.className = "show";
+      setTimeout(() => {
+        toast.className = toast.className.replace("show", "");
+      }, 3000);
     }
 
     function pegarIMEI() {
@@ -125,7 +168,7 @@
         .then(texto => {
           document.getElementById("imeiValidar").value = texto.trim();
         })
-        .catch(() => alert("❌ No se pudo acceder al portapapeles."));
+        .catch(() => mostrarToast("❌ No se pudo acceder al portapapeles."));
     }
 
     function validarIMEI() {
